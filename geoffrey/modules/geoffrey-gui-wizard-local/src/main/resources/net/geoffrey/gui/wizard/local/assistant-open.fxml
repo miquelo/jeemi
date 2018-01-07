@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox
+	xmlns:fx="http://javafx.com/fxml"
+	alignment="TOP_LEFT"
+	spacing="10"
+	fx:controller="net.geoffrey.gui.wizard.local.LocalWizardOpenController">
+	
+	<Label
+		text="%domainAdminPortLabelText">
+	</Label>
+	
+	<TextField
+		maxWidth="80">
+	</TextField>
+	
+</VBox>
