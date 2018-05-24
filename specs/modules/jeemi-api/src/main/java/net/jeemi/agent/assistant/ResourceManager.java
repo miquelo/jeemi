@@ -9,7 +9,7 @@ import java.util.stream.Stream;
  */
 public interface ResourceManager
 {
-	Stream<ResourceInfo> all();
+	Stream<ResourceInfo> resources();
 	
 	void create(ResourceSpecs specs);
 	

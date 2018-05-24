@@ -1,5 +1,8 @@
 package net.jeemi.agent;
 
+import java.util.Optional;
+import java.util.stream.Stream;
+
 /**
  * Enterprise domain.
  * 
@@ -7,4 +10,11 @@ package net.jeemi.agent;
  */
 public interface EnterpriseDomain
 {
+	EnterpriseDomainName getName();
+	
+	Stream<Application> applications();
+	
+	Optional<Application> find(ApplicationName name);
+	
+	Application run(ApplicationParams params);
 }

@@ -11,7 +11,7 @@ import net.jeemi.artifact.Artifact;
  */
 public interface ResourceConnectorManager
 {
-	Stream<ResourceConnectorInfo> all();
+	Stream<ResourceConnectorInfo> connectors();
 	
 	void deploy(ResourceConnectorSpecs specs, Artifact artifact);
 	

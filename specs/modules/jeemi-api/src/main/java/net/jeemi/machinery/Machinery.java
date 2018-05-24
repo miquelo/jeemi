@@ -1,5 +1,7 @@
 package net.jeemi.machinery;
 
+import net.jeemi.machinery.event.MachineEventListener;
+
 /**
  * Machinery.
  * 
@@ -7,4 +9,15 @@ package net.jeemi.machinery;
  */
 public interface Machinery
 {
+	<T extends Machine> T lookup(MachineRef ref);
+	
+	DASMachine create(DASMachineSpecs specs);
+	
+	NodeMachine create(NodeMachineSpecs specs);
+	
+	void leave(MachineRef ref);
+	
+	void addMachineEventListener(MachineEventListener listener);
+	
+	void removeMachineEventListener(MachineEventListener listener);
 }

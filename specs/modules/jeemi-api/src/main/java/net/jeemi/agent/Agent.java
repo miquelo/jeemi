@@ -1,5 +1,6 @@
 package net.jeemi.agent;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -9,5 +10,9 @@ import java.util.stream.Stream;
  */
 public interface Agent
 {
-	Stream<Layout> layouts();
+	Stream<EnterpriseDomain> domains();
+	
+	Optional<EnterpriseDomain> find(EnterpriseDomainName name);
+	
+	void cleanup();
 }
