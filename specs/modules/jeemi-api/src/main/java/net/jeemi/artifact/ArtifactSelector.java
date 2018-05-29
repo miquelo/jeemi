@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Artifact coordinates.
+ * Artifact selector.
  * 
  * @author Miquel A. Ferran Gonzalez &lt;miquel.ferran.gonzalez@gmail.com&gt;
  */
-public class ArtifactCoordinates
+public class ArtifactSelector
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -25,7 +25,7 @@ implements Serializable
 	
 	private String groupId;
 	private String artifactId;
-	private ArtifactCoordinatesVersion version;
+	private ArtifactSelectorVersion version;
 	private ArtifactType type;
 	
 	@ConstructorProperties({
@@ -34,8 +34,8 @@ implements Serializable
 		"version",
 		"type"
 	})
-	public ArtifactCoordinates(String groupId, String artifactId,
-			ArtifactCoordinatesVersion version, ArtifactType type)
+	public ArtifactSelector(String groupId, String artifactId,
+			ArtifactSelectorVersion version, ArtifactType type)
 	{
 		this.groupId = Objects.requireNonNull(groupId);
 		this.artifactId = Objects.requireNonNull(artifactId);
@@ -53,7 +53,7 @@ implements Serializable
 		return artifactId;
 	}
 	
-	public ArtifactCoordinatesVersion getVersion()
+	public ArtifactSelectorVersion getVersion()
 	{
 		return version;
 	}
@@ -72,9 +72,9 @@ implements Serializable
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof ArtifactCoordinates)
+		if (obj instanceof ArtifactSelector)
 		{
-			ArtifactCoordinates coords = (ArtifactCoordinates) obj;
+			ArtifactSelector coords = (ArtifactSelector) obj;
 			return groupId.equals(coords.groupId)
 					&& artifactId.equals(coords.artifactId)
 					&& version.equals(coords.version)
@@ -95,27 +95,26 @@ implements Serializable
 		return new BuilderImpl();
 	}
 	
-	public static ArtifactCoordinates parseCoordinates(String str)
+	public static ArtifactSelector parseSelector(String str)
 	{
 		Matcher matcher = PATTERN.matcher(str);
 		if (matcher.find())
 		{
 			String groupId = matcher.group(1);
 			String artifactId = matcher.group(2);
-			ArtifactCoordinatesVersion version =
-					ArtifactCoordinatesVersion.parseVersion(matcher.group(3));
+			ArtifactSelectorVersion version =
+					ArtifactSelectorVersion.parseVersion(matcher.group(3));
 			String typeName = matcher.group(5);
-			return new ArtifactCoordinates(
+			return new ArtifactSelector(
 				groupId,
 				artifactId,
 				version,
 				typeName == null ? null : lookupType(str, typeName));
 		}
-		throw new ArtifactCoordinatesFormatException(
-				formatExceptionMessage(str));
+		throw new ArtifactSelectorFormatException(formatExceptionMessage(str));
 	}
 	
-	private ArtifactCoordinates(BuilderImpl builder)
+	private ArtifactSelector(BuilderImpl builder)
 	{
 		groupId = builder.groupId;
 		artifactId = builder.artifactId;
@@ -154,14 +153,14 @@ implements Serializable
 	
 	public interface BuilderVersion
 	{
-		Builder withVersion(ArtifactCoordinatesVersion version);
+		Builder withVersion(ArtifactSelectorVersion version);
 	}
 	
 	public interface Builder
 	{
 		Builder withType(ArtifactType type);
 		
-		ArtifactCoordinates build();
+		ArtifactSelector build();
 	}
 	
 	private static class BuilderImpl
@@ -169,7 +168,7 @@ implements Serializable
 	{
 		private String groupId;
 		private String artifactId;
-		private ArtifactCoordinatesVersion version;
+		private ArtifactSelectorVersion version;
 		private ArtifactType type;
 		
 		public BuilderImpl()
@@ -195,7 +194,7 @@ implements Serializable
 		}
 		
 		@Override
-		public Builder withVersion(ArtifactCoordinatesVersion version)
+		public Builder withVersion(ArtifactSelectorVersion version)
 		{
 			this.version = Objects.requireNonNull(version);
 			return this;
@@ -209,9 +208,9 @@ implements Serializable
 		}
 
 		@Override
-		public ArtifactCoordinates build()
+		public ArtifactSelector build()
 		{
-			return new ArtifactCoordinates(this);
+			return new ArtifactSelector(this);
 		}
 	}
 }
