@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import net.jeemi.artifact.coordinates.Packaging;
+import net.jeemi.spi.artifact.coordinates.Packaging;
 
 public class PackagingTest
 {
