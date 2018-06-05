@@ -3,10 +3,14 @@ package net.jeemi.artifact;
 import java.beans.ConstructorProperties;
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import net.jeemi.artifact.coordinates.ArtifactId;
+import net.jeemi.artifact.coordinates.GroupId;
+import net.jeemi.artifact.coordinates.Packaging;
+import net.jeemi.artifact.coordinates.VersionWants;
 
 /**
  * Artifact selector.
@@ -18,76 +22,58 @@ implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
-	private static final Pattern PATTERN = Pattern.compile(
-			"^(.+):(.+):(.+)(:(.+))?$");
+	public static final Packaging DEFAULT_PACKAGING = Packaging.JAR;
 	
-	public static final ArtifactType DEFAULT_TYPE = ArtifactType.JAR;
-	
-	private String groupId;
-	private String artifactId;
-	private ArtifactSelectorVersion version;
-	private ArtifactType type;
+	private GroupId groupId;
+	private ArtifactId artifactId;
+	private VersionWants versionWants;
+	private Packaging packaging;
 	
 	@ConstructorProperties({
 		"groupId",
 		"artifactId",
-		"version",
-		"type"
+		"versionWants",
+		"packaging"
 	})
-	public ArtifactSelector(String groupId, String artifactId,
-			ArtifactSelectorVersion version, ArtifactType type)
+	public ArtifactSelector(GroupId groupId, ArtifactId artifactId,
+			VersionWants versionWants, Packaging packaging)
 	{
 		this.groupId = Objects.requireNonNull(groupId);
 		this.artifactId = Objects.requireNonNull(artifactId);
-		this.version = Objects.requireNonNull(version);
-		this.type = type == null ? DEFAULT_TYPE : type;
+		this.versionWants = Objects.requireNonNull(versionWants);
+		this.packaging = Optional.ofNullable(packaging)
+			.orElse(DEFAULT_PACKAGING);
 	}
 
-	public String getGroupId()
+	public GroupId getGroupId()
 	{
 		return groupId;
 	}
 
-	public String getArtifactId()
+	public ArtifactId getArtifactId()
 	{
 		return artifactId;
 	}
 	
-	public ArtifactSelectorVersion getVersion()
+	public VersionWants getVersionWants()
 	{
-		return version;
+		return versionWants;
 	}
 
-	public ArtifactType getType()
+	public Packaging getPackaging()
 	{
-		return type;
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return groupId.hashCode();
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (obj instanceof ArtifactSelector)
-		{
-			ArtifactSelector coords = (ArtifactSelector) obj;
-			return groupId.equals(coords.groupId)
-					&& artifactId.equals(coords.artifactId)
-					&& version.equals(coords.version)
-					&& type.equals(coords.type);
-		}
-		return false;
+		return packaging;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return Stream.of(groupId, artifactId, version.toString(), type.name())
-			.collect(Collectors.joining(":"));
+		return Stream.of(
+			groupId.toString(),
+			artifactId.toString(),
+			versionWants.toString(),
+			packaging.name())
+		.collect(Collectors.joining(":"));
 	}
 	
 	public static BuilderGroupId builder()
@@ -95,115 +81,78 @@ implements Serializable
 		return new BuilderImpl();
 	}
 	
-	public static ArtifactSelector parseSelector(String str)
-	{
-		Matcher matcher = PATTERN.matcher(str);
-		if (matcher.find())
-		{
-			String groupId = matcher.group(1);
-			String artifactId = matcher.group(2);
-			ArtifactSelectorVersion version =
-					ArtifactSelectorVersion.parseVersion(matcher.group(3));
-			String typeName = matcher.group(5);
-			return new ArtifactSelector(
-				groupId,
-				artifactId,
-				version,
-				typeName == null ? null : lookupType(str, typeName));
-		}
-		throw new ArtifactSelectorFormatException(formatExceptionMessage(str));
-	}
-	
 	private ArtifactSelector(BuilderImpl builder)
 	{
-		groupId = builder.groupId;
-		artifactId = builder.artifactId;
-		version = builder.version;
-		type = builder.type;
-	}
-	
-	private static ArtifactType lookupType(String str, String typeName)
-	{
-		try
-		{
-			return ArtifactType.lookup(typeName);
-		}
-		catch (UnknownArtifactTypeException exception)
-		{
-			throw new ArtifactCoordinatesFormatException(
-					formatExceptionMessage(str),
-					exception);
-		}
-	}
-	
-	private static String formatExceptionMessage(String str)
-	{
-		return String.format("Illegal artifact coordinates %s", str);
+		this(
+			builder.groupId,
+			builder.artifactId,
+			builder.versionWants,
+			builder.packaging);
 	}
 	
 	public interface BuilderGroupId
 	{
-		BuilderArtifactId withGroupId(String groupId);
+		BuilderArtifactId withGroupId(GroupId groupId);
 	}
 	
 	public interface BuilderArtifactId
 	{
-		BuilderVersion withArtifactId(String artifactId);
+		BuilderVersionWants withArtifactId(ArtifactId artifactId);
 	}
 	
-	public interface BuilderVersion
+	public interface BuilderVersionWants
 	{
-		Builder withVersion(ArtifactSelectorVersion version);
+		Builder withVersionWants(VersionWants versionWants);
 	}
 	
 	public interface Builder
 	{
-		Builder withType(ArtifactType type);
+		Builder withPackaging(Packaging packaging);
 		
 		ArtifactSelector build();
 	}
 	
 	private static class BuilderImpl
-	implements BuilderGroupId, BuilderArtifactId, BuilderVersion, Builder
+	implements BuilderGroupId, BuilderArtifactId, BuilderVersionWants, Builder
 	{
-		private String groupId;
-		private String artifactId;
-		private ArtifactSelectorVersion version;
-		private ArtifactType type;
+		private GroupId groupId;
+		private ArtifactId artifactId;
+		private VersionWants versionWants;
+		private Packaging packaging;
 		
 		public BuilderImpl()
 		{
 			groupId = null;
 			artifactId = null;
-			version = null;
-			type = DEFAULT_TYPE;
+			versionWants = null;
+			packaging = null;
 		}
 		
 		@Override
-		public BuilderArtifactId withGroupId(String groupId)
+		public BuilderArtifactId withGroupId(GroupId groupId)
 		{
 			this.groupId = Objects.requireNonNull(groupId);
 			return this;
 		}
 		
 		@Override
-		public BuilderVersion withArtifactId(String artifactId)
+		public BuilderVersionWants withArtifactId(ArtifactId artifactId)
 		{
 			this.artifactId = Objects.requireNonNull(artifactId);
 			return this;
 		}
 		
 		@Override
-		public Builder withVersion(ArtifactSelectorVersion version)
+		public Builder withVersionWants(VersionWants versionWants)
 		{
-			this.version = Objects.requireNonNull(version);
+			this.versionWants = Objects.requireNonNull(versionWants);
 			return this;
 		}
 		
 		@Override
-		public Builder withType(ArtifactType type)
+		public Builder withPackaging(Packaging packaging)
 		{
-			this.type = Objects.requireNonNull(type);
+			this.packaging = Objects.requireNonNull(packaging);
 			return this;
 		}
 

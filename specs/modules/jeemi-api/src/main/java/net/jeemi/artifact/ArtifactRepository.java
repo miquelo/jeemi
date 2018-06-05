@@ -1,5 +1,7 @@
 package net.jeemi.artifact;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 
 /**
@@ -10,4 +12,7 @@ import java.util.Optional;
 public interface ArtifactRepository
 {
 	Optional<Artifact> find(ArtifactSelector selector);
+	
+	InputStream fetch(Artifact artifact)
+	throws IOException;
 }
