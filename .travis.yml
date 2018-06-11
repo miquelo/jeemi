@@ -3,5 +3,10 @@
 language: java
 sudo: false # faster builds
 
+script:
+- mvn -version
+- sh setup.sh test
+
 after_success:
 - bash <(curl -s https://codecov.io/bash)
+
