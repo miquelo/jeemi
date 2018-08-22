@@ -18,7 +18,7 @@ help)
 echo "Available commands
 ------------------
 clean         Clean all generated files.
-test          Test the current snaphot.
+test          Test the current snapshot.
 install-tool  Install RI tool from current source files."
 ;;
 

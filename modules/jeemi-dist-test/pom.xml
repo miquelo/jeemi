@@ -38,27 +38,27 @@
 		
 		<dependency>
 			<groupId>net.jeemi</groupId>
-			<artifactId>jeemi-ri-agent-gf4</artifactId>
+			<artifactId>jeemi-ri-agent-gf5</artifactId>
 			<version>0.1-SNAPSHOT</version>
 			<type>ejb</type>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.jeemi</groupId>
-			<artifactId>jeemi-ri-agent-gf4-admin</artifactId>
+			<artifactId>jeemi-ri-agent-gf5-admin</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.jeemi</groupId>
-			<artifactId>jeemi-ri-agent-gf4-admin-ssh</artifactId>
+			<artifactId>jeemi-ri-agent-gf5-admin-ssh</artifactId>
 			<version>0.1-SNAPSHOT</version>
 			<type>rar</type>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.jeemi</groupId>
-			<artifactId>jeemi-ri-agent-gf4-machinery</artifactId>
+			<artifactId>jeemi-ri-agent-gf5-machinery</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		

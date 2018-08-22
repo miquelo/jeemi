@@ -64,6 +64,8 @@ public class InfrastructureServiceManagerTest
 	throws Exception
 	{
 		serviceMgr.prepare(ANY_SETTINGS);
+		
+		// TODO Missing 'then' block
 	}
 	
 	@Test(expected = InfrastructureServiceManagerException.class)
@@ -74,6 +76,8 @@ public class InfrastructureServiceManagerTest
 			.when(serviceMgr).storeProperties(any());
 		
 		serviceMgr.prepare(ANY_SETTINGS);
+		
+		// TODO Missing 'then' block
 	}
 	
 	@Test

@@ -18,8 +18,9 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
-import net.jeemi.ri.tool.service.admin.AdminCommand;
-import net.jeemi.ri.tool.service.admin.AdminCommandContext;
+import net.jeemi.ri.tool.service.admin.AdminApplication;
+import net.jeemi.ri.tool.service.admin.command.AdminCommandContext;
+import net.jeemi.ri.tool.service.admin.command.AdminDeleteDomainCommand;
 import net.jeemi.ri.tool.util.SharedBundle;
 import net.jeemi.ri.tool.util.Unzipper;
 
@@ -71,17 +72,18 @@ public class InfrastructureServiceManager
 				serverDir,
 				GLASSFISH_V5_INSTALLER_SOURCE_SIZE);
 			
-			AdminCommandContext context = AdminCommandContext.builder()
+			AdminApplication application = AdminApplication.builder()
 				.withRandom(new Random())
 				.withBinDir(new File(new File(serverDir, "glassfish5"), "bin"))
 				.build();
-			AdminCommand.deleteDomain()
+			application.execute(AdminDeleteDomainCommand.builder()
 				.withDomainName("domain1")
-				.build()
-				.execute(context)
+				.build(AdminCommandContext.builder()
+					.build()))
 				.get();
 		}
-		catch (IOException | ExecutionException | InterruptedException exception)
+		catch (IOException | ExecutionException
+				| InterruptedException exception)
 		{
 			throw new InfrastructureServiceManagerException(exception);
 		}
@@ -98,10 +100,11 @@ public class InfrastructureServiceManager
 			concat(
 				of(CURRENT_VERSION),
 				stream(SUPPORTED_VERSIONS, 0, SUPPORTED_VERSIONS.length))
-				.filter(version::equals)
-				.findAny()
-				.orElseThrow(() -> new InfrastructureServiceManagerException(
-					format("Unsupported version %s", version)));
+					.filter(version::equals)
+					.findAny()
+					.orElseThrow(() ->
+							new InfrastructureServiceManagerException(
+						format("Unsupported version %s", version)));
 			
 			return new InfrastructureService(serverDir);
 		}
@@ -111,7 +114,7 @@ public class InfrastructureServiceManager
 		}
 	}
 	
-	Properties loadProperties()
+	protected Properties loadProperties()
 	throws IOException
 	{
 		try (Reader reader = new FileReader(propertiesFile))
@@ -122,7 +125,7 @@ public class InfrastructureServiceManager
 		}
 	}
 	
-	void storeProperties(Properties properties)
+	protected void storeProperties(Properties properties)
 	throws IOException
 	{
 		try (Writer writer = new FileWriter(propertiesFile))
@@ -131,7 +134,7 @@ public class InfrastructureServiceManager
 		}
 	}
 	
-	URI parseURI(String str)
+	protected URI parseURI(String str)
 	{
 		try
 		{
