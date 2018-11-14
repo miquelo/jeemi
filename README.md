@@ -17,14 +17,7 @@ ends at application container level. On other words, even a cloud based
 infrastructure, a new software component version does not require a new machine
 instance but a new artifact deployment on an existing managed infrastructure.
 
-## Using RI configuration tool
-
-The given reference implementation comes with a tool for configuring a service
-on a compatible operating system. It can be used when provisioning a machine instance or when creating a machine image.
-
-It should be installed by the matching package manager, when there is any.
-
-### Available machine provisioners and images
+### Available agent images
 
 _Coming soon..._
 
@@ -40,18 +33,11 @@ $ sh setup.sh test
 It ensures your contribution doesn't break any tested thing. We are humans, so
 we can have bugs. Note that testing process can take a little bit time.
 
-The reference implementation tool can be installed from these source files by doing
-
-```sh
-$ sh setup.sh install-tool
-```
-
-It allows manual testing on this reference implementation through configuring a local service. When using it, the current snapshot is previously tested as far it is needed.
-
 If you need a completely cleaned environment before testing, you can do
 
 ```sh
 $ sh setup.sh clean
 ```
 
-Maybe some generated files are not removed or restored after this operation. But it tries to do it.
+Maybe some generated files are not removed or restored after this operation. But
+it tries to do it.

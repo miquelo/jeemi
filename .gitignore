@@ -1,5 +1,8 @@
 .settings/
-target/
+module/*/target/
+image/package/
+setup/certificate/build/
 
 .classpath
 .project
+.java-version

@@ -1,7 +1,11 @@
 # https://github.com/codecov/example-java
 
 language: java
+
 sudo: false # faster builds
+
+services:
+- docker
 
 script:
 - mvn -version
@@ -9,4 +13,3 @@ script:
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
-

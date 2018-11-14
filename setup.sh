@@ -10,16 +10,21 @@ test)
 ./setup/command/test.sh
 ;;
 
-install-tool)
-./setup/command/install-tool.sh
+deploy)
+./setup/command/deploy.sh
+;;
+
+prove)
+./setup/command/prove.sh
 ;;
 
 help)
 echo "Available commands
 ------------------
-clean         Clean all generated files.
-test          Test the current snapshot.
-install-tool  Install RI tool from current source files."
+clean   Clean all generated contents.
+test    Test the current snapshot.
+deploy  Deploy a new version from the current snapshot.
+prove   Prove the current snapshot for manual testing or demonstration."
 ;;
 
 *)

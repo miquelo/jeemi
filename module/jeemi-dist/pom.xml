@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>net.jeemi</groupId>
+		<artifactId>jeemi</artifactId>
+		<version>1.0</version>
+	</parent>
+	
+	<artifactId>jeemi-dist</artifactId>
+	<version>0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	<name>JEEMI Distribution</name>
+	<description>
+		Distribution of Jakarta EE Mutable Infrastructure API and its reference
+		implementation.
+	</description>
+	
+	<modules>
+		<module>../jeemi-api</module>
+		<module>../jeemi-ri-agent</module>
+		<module>../jeemi-ri-agent-gf5</module>
+		<module>../jeemi-ri-agent-gf5-admin</module>
+		<module>../jeemi-ri-agent-gf5-admin-ssh</module>
+		<module>../jeemi-ri-agent-gf5-machinery</module>
+		<module>../jeemi-ri-management</module>
+		<module>../jeemi-dist-test</module>
+	</modules>
+	
+</project>
+

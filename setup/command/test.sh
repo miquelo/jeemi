@@ -1,4 +1,7 @@
 #!/bin/bash
 
-mvn -f modules/jeemi/pom.xml install
-mvn -f modules/jeemi-dist/pom.xml verify site
+mvn -f module/jeemi/pom.xml install
+mvn -f module/jeemi-dist/pom.xml verify site
+
+setup/shared/build-images.sh
+
