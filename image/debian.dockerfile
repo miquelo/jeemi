@@ -1,18 +1,16 @@
 #
-# Debian Linux with Supervisor
+# Debian Linux
 #
 
 FROM library/debian:stretch-backports
 
-COPY [ "script/prepare-system.sh", "/tmp/setup/execute.sh" ]
-RUN [ "sh", "/tmp/setup/execute.sh" ]
+COPY [ "script/build-prepare.sh", "/tmp/build.sh" ]
+RUN [ "sh", "/tmp/build.sh" ]
 
-COPY [ "script/prepare-supervisor.sh", "/tmp/setup/execute.sh" ]
-RUN [ "sh", "/tmp/setup/execute.sh" ]
+COPY [ "script/build-clean.sh", "/tmp/build.sh" ]
+RUN [ "sh", "/tmp/build.sh" ]
 
-COPY [ "script/clean-system.sh", "/tmp/setup/execute.sh" ]
-RUN [ "sh", "/tmp/setup/execute.sh" ]
+RUN [ "rm", "/tmp/build.sh" ]
 
-RUN [ "rm", "-r", "/tmp/setup" ]
-ENTRYPOINT [ "supervisord", "-n" ]
+ENTRYPOINT [ "/init" ]
 

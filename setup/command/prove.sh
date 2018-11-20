@@ -10,21 +10,22 @@ setup/shared/build-certificates.sh
 # -it --entrypoint /bin/bash
 docker run \
 -d \
---name jeemi-agent-ssh \
---hostname jeemi-agent \
+--name jeemi-agent \
+--hostname agent \
 -p 2201:22 \
--p 8011:80 \
--p 4431:443 \
--e "SSH_AUTHORIZED_KEYS=$(cat $HOME/.ssh/*.pub | (base64 -w 0 || base64))" \
+-p 8880:80 \
+-p 4443:443 \
+-p 24848:4848 \
 -e "DOCKER_ADDRESS=/var/run/docker.sock" \
--e "APACHE2_CERTIFICATE=$(cat setup/certificate/build/server/certs/\
-jeemi.test.cert.pem | (base64 -w 0 || base64))" \
--e "APACHE2_PRIVATE_KEY=$(cat setup/certificate/build/server/private/\
-jeemi.test.key.pem | (base64 -w 0 || base64))" \
--v /var/run/docker.sock:/var/run/docker.sock \
-jeemi/agent-ssh
+-v $HOME/.ssh/id_rsa.pub:/home/farmer/.ssh/authorized_keys.d/id_rsa.pub \
+-v $PWD/setup/certificate/build/server/certs/jeemi.test.cert.pem:\
+/home/farmer/lib/apache2/cert.pem \
+-v $PWD/setup/certificate/build/server/private/jeemi.test.key.pem:\
+/home/farmer/lib/apache2/key.pem \
+jeemi/agent
 
 read -r -p 'You can prove it now... [Press ENTER when finished]' _
 
-docker rm -f jeemi-agent-ssh
+# docker rm -f jeemi-agent-ssh
+docker rm -f jeemi-agent
 
