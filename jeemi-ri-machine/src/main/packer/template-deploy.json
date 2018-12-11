@@ -1,0 +1,10 @@
+{
+	"builders": [
+		{
+			"name": "docker",
+			"type": "docker",
+			"image": "jeemi/machine:${project.version}",
+			"commit": true
+		}
+	]
+}

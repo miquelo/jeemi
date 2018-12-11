@@ -1,0 +1,62 @@
+{
+	"builders": [
+		{
+			"name": "docker",
+			"type": "docker",
+			"image": "library/debian:stretch-backports",
+			"commit": true,
+			"changes": [
+				"ENTRYPOINT /init"
+			]
+		}
+	],
+	"provisioners": [
+		{
+			"type": "shell",
+			"script": "{{template_dir}}/script/prepare.sh"
+		},
+		{
+			"type": "shell",
+			"script": "{{template_dir}}/script/prepare-docker.sh",
+			"only": [ "docker" ]
+		},
+		{
+			"type": "shell",
+			"script": "{{template_dir}}/script/ssh-server.sh"
+		},
+		{
+			"type": "shell",
+			"script": "{{template_dir}}/script/jdk8.sh"
+		},
+		{
+			"type": "shell",
+			"script": "{{template_dir}}/script/apache2.sh"
+		},
+		{
+			"type": "file",
+			"source": "{{template_dir}}/resource/",
+			"destination": "/tmp/jeemi/packer"
+		},
+		{
+			"type": "file",
+			"source": "${project.build.directory}/${project.build.finalName}.jar",
+			"destination": "/usr/local/lib/jeemi/machine.jar"
+		},
+		{
+			"type": "shell",
+			"script": "{{template_dir}}/script/configure.sh"
+		},
+		{
+			"type": "shell",
+			"script": "{{template_dir}}/script/clean.sh"
+		}
+	],
+	"post-processors": [
+		{
+			"type": "docker-tag",
+			"repository": "jeemi/machine",
+			"tag": "${project.version}",
+			"only": [ "docker" ]
+		}
+	]
+}

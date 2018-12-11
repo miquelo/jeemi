@@ -7,9 +7,5 @@ sudo: false # faster builds
 services:
 - docker
 
-script:
-- mvn -version
-- sh setup.sh test
-
 after_success:
 - bash <(curl -s https://codecov.io/bash)

@@ -1,7 +1,5 @@
 .settings/
-module/*/target/
-image/package/
-setup/certificate/build/
+target/
 
 .classpath
 .project

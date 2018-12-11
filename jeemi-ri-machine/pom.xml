@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>net.jeemi</groupId>
+		<artifactId>jeemi</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
+	
+	<artifactId>jeemi-ri-machine</artifactId>
+	<packaging>jar</packaging>
+	
+	<name>JEEMI RI - Machine</name>
+	<description>
+		Common resources for building a machine of Jakarta EE Mutable
+		Infrastructure reference implementation.
+	</description>
+	
+	<build>
+		<plugins>
+			
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>packer-resources</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/packer</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/packer</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.4.1</version>
+				<executions>
+					<execution>
+						<id>download-glassfish-v5</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<uri>http://download.oracle.com/glassfish/5.0/release/glassfish-5.0.zip</uri>
+							<outputDirectory>${project.build.directory}/packer/resource/tmp/jeemi/install</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<id>test-certificate</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<phase>process-test-resources</phase>
+						<configuration>
+							<executable>${basedir}/src/test/sh/certificate.sh</executable>
+							<workingDirectory>${basedir}</workingDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>packer-package</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<executable>${basedir}/src/main/sh/packer-build.sh</executable>
+							<arguments>
+								<argument>package</argument>
+							</arguments>
+							<workingDirectory>${project.build.directory}/packer</workingDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>packer-deploy</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<phase>deploy</phase>
+						<configuration>
+							<executable>${basedir}/src/main/sh/packer-build.sh</executable>
+							<arguments>
+								<argument>deploy</argument>
+							</arguments>
+							<workingDirectory>${project.build.directory}/packer</workingDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+		</plugins>
+	</build>
+	
+</project>

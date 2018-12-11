@@ -1,0 +1,13 @@
+[Unit]
+Description=JEEMI Lifecycle Service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=no
+User=root
+ExecStart=jeemi-lifecycle-ctl start
+
+[Install]
+WantedBy=multi-user.target
