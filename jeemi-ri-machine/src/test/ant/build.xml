@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://jamielinux.com/docs/openssl-certificate-authority/index.html -->
+<project>
+	
+	<target name="archive" description="Build test archives">
+		
+		<property name="certificateInputDir" value="${basedir}/machine/src/certificate"/>
+		<property name="certificateOutputDir" value="${basedir}/machine/src/classes/net/jeemi/ri/test/certificate"/>
+		
+		<ant target="machine-certificate" antfile="${maven.basedir}/src/test/ant/lib/machine-certificate.xml" dir="${certificateInputDir}"/>
+		<mkdir dir="${certificateOutputDir}"/>
+		<mkdir dir="${certificateOutputDir}/root"/>
+		<copy todir="${certificateOutputDir}/root">
+			<fileset dir="${certificateInputDir}/root/certs" includes="*.pem"/>
+			<fileset dir="${certificateInputDir}/root/private" includes="*.pem"/>
+		</copy>
+		<mkdir dir="${certificateOutputDir}/ca"/>
+		<copy todir="${certificateOutputDir}/ca">
+			<fileset dir="${certificateInputDir}/ca/certs" includes="*.pem"/>
+			<fileset dir="${certificateInputDir}/ca/private" includes="*.pem"/>
+		</copy>
+		<mkdir dir="${certificateOutputDir}/server"/>
+		<copy todir="${certificateOutputDir}/server">
+			<fileset dir="${certificateInputDir}/server/certs" includes="*"/>
+			<fileset dir="${certificateInputDir}/server/private" includes="*"/>
+		</copy>
+		
+	</target>
+
+</project>

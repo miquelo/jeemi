@@ -1,0 +1,29 @@
+{
+	"builders": [
+		{
+			"type": "virtualbox-ovf",
+			
+			"source_path": "${project.packer.workingDirectory}/output/debian-root/debian-root.ovf",
+			
+			"vm_name": "jeemi-base",
+			"headless": true,
+			"ssh_username": "root",
+			"ssh_password": "root",
+			"ssh_wait_timeout": "10000s",
+			"shutdown_command": "shutdown -P now",
+			"guest_additions_mode": "disable",
+			"output_directory": "${project.packer.workingDirectory}/output/jeemi-base"
+		}
+	],
+	"provisioners": [
+		{
+			"type": "shell",
+			"scripts": [
+				"{{template_dir}}/script/prepare.sh",
+				"{{template_dir}}/script/ssh-server.sh",
+				"{{template_dir}}/script/jdk8.sh",
+				"{{template_dir}}/script/apache2.sh"
+			]
+		}
+	]
+}

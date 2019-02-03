@@ -23,7 +23,6 @@ sed -ie "s/$SEARCH_PATTERN/$REPLACE_PATTERN/g" \
 /etc/ssh/sshd_config
 
 useradd -r -s /bin/false authkeys
-chmod 0555 /usr/bin/authkeys
 
 echo '#!/bin/sh
 
@@ -36,6 +35,7 @@ test -d $SSH_AUTHORIZED_KEYS_DIR && \
 test ! -z "$(ls -A $SSH_AUTHORIZED_KEYS_DIR)" && \
 cat $SSH_AUTHORIZED_KEYS_DIR/*' > \
 /usr/bin/authkeys
+chmod 0555 /usr/bin/authkeys
 
 mkdir -p /var/run/sshd
 chmod 0700 /var/run/sshd

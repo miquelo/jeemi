@@ -35,10 +35,26 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/packer</outputDirectory>
+							<outputDirectory>${project.packer.workingDirectory}</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${basedir}/src/main/packer</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>test-archive-resources</id>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.testArchive.workingDirectory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/test/archive</directory>
 									<filtering>true</filtering>
 								</resource>
 							</resources>
@@ -60,60 +76,83 @@
 						</goals>
 						<configuration>
 							<uri>http://download.oracle.com/glassfish/5.0/release/glassfish-5.0.zip</uri>
-							<outputDirectory>${project.build.directory}/packer/resource/tmp/jeemi/install</outputDirectory>
+							<outputDirectory>${project.packer.workingDirectory}/input/jeemi-base/file/tmp/jeemi/install</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 			
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.6.0</version>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
 				<executions>
-					<execution>
-						<id>test-certificate</id>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<phase>process-test-resources</phase>
-						<configuration>
-							<executable>${basedir}/src/test/sh/certificate.sh</executable>
-							<workingDirectory>${basedir}</workingDirectory>
-						</configuration>
-					</execution>
 					<execution>
 						<id>packer-package</id>
 						<goals>
-							<goal>exec</goal>
+							<goal>run</goal>
 						</goals>
 						<phase>package</phase>
 						<configuration>
-							<executable>${basedir}/src/main/sh/packer-build.sh</executable>
-							<arguments>
-								<argument>package</argument>
-							</arguments>
-							<workingDirectory>${project.build.directory}/packer</workingDirectory>
+							<target name="build">
+								<ant target="packer" antfile="${basedir}/src/main/ant/build.xml" dir="${project.packer.workingDirectory}">
+									<property name="maven.phase" value="package"/>
+									<property name="maven.project.build.outputDirectory" value="${project.build.outputDirectory}"/>
+								</ant>
+							</target>
+							<skip>${project.packer.skip}</skip>
 						</configuration>
 					</execution>
 					<execution>
 						<id>packer-deploy</id>
 						<goals>
-							<goal>exec</goal>
+							<goal>run</goal>
 						</goals>
-						<phase>deploy</phase>
+						<phase>package</phase>
 						<configuration>
-							<executable>${basedir}/src/main/sh/packer-build.sh</executable>
-							<arguments>
-								<argument>deploy</argument>
-							</arguments>
-							<workingDirectory>${project.build.directory}/packer</workingDirectory>
+							<target name="build">
+								<ant target="packer" antfile="${basedir}/src/main/ant/build.xml" dir="${project.packer.workingDirectory}">
+									<property name="maven.phase" value="deploy"/>
+									<property name="maven.project.build.outputDirectory" value="${project.build.outputDirectory}"/>
+								</ant>
+							</target>
+							<skip>${project.packer.skip}</skip>
+						</configuration>
+					</execution>
+					<execution>
+						<id>test-archive</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>process-test-resources</phase>
+						<configuration>
+							<target name="build">
+								<ant target="archive" antfile="${basedir}/src/test/ant/build.xml" dir="${project.testArchive.workingDirectory}">
+									<property name="maven.basedir" value="${basedir}"/>
+								</ant>
+							</target>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 			
 		</plugins>
+		<testResources>
+		
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>net/jeemi/ri/machine/integration/tools/factory.properties</include>
+				</includes>
+			</testResource>
+			
+		</testResources>
 	</build>
+	
+	<properties>
+		<project.packer.workingDirectory>${project.build.directory}/packer</project.packer.workingDirectory>
+		<project.packer.skip>${env.VIRTUALBOX_UNAVAILABLE}</project.packer.skip>
+		<project.testArchive.workingDirectory>${project.build.directory}/test-archive</project.testArchive.workingDirectory>
+	</properties>
 	
 </project>

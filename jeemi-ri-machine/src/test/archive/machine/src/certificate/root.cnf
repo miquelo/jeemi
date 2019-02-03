@@ -4,7 +4,7 @@ default_ca              = CA_default
 
 [ CA_default ]
 
-dir                     = ../../../../target/certificate/root
+dir                     = ${project.testArchive.workingDirectory}/machine/src/certificate/root
 certs                   = $dir/certs
 new_certs_dir           = $dir/newcerts
 database                = $dir/index.txt

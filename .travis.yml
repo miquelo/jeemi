@@ -4,6 +4,9 @@ language: java
 
 sudo: false # faster builds
 
+env:
+  - VIRTUALBOX_UNAVAILABLE=true
+
 services:
 - docker
 

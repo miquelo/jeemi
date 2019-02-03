@@ -1,0 +1,43 @@
+{
+	"builders": [
+		{
+			"type": "virtualbox-ovf",
+			
+			"source_path": "${project.packer.workingDirectory}/output/jeemi-base/jeemi-base.ovf",
+			
+			"vm_name": "jeemi-machine",
+			"headless": true,
+			"ssh_username": "root",
+			"ssh_password": "root",
+			"ssh_wait_timeout": "10000s",
+			"shutdown_command": "shutdown -P now",
+			"guest_additions_mode": "disable",
+			"output_directory": "${project.packer.workingDirectory}/output/jeemi-machine"
+		}
+	],
+	"provisioners": [
+		{
+			"type": "shell",
+			"scripts": [
+				"{{template_dir}}/script/prepare.sh"
+			]
+		},
+		{
+			"type": "file",
+			"source": "{{template_dir}}/file/",
+			"destination": "/tmp/jeemi/packer"
+		},
+		{
+			"type": "file",
+			"source": "${project.build.directory}/${project.build.finalName}.jar",
+			"destination": "/tmp/jeemi/packer/usr/local/lib/jeemi/machine.jar"
+		},
+		{
+			"type": "shell",
+			"scripts": [
+				"{{template_dir}}/script/configure.sh",
+				"{{template_dir}}/script/clean.sh"
+			]
+		}
+	]
+}
