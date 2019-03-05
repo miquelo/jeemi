@@ -1,14 +1,16 @@
-# https://github.com/codecov/example-java
-
 language: java
 
-sudo: false # faster builds
+sudo: false
 
 env:
   - VIRTUALBOX_UNAVAILABLE=true
 
-services:
-- docker
+install:
+- mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -Pjeemi-maven-plugin
+- mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -Pjeemi-components
+
+script:
+- mvn verify -B -V -Pjeemi-maven-plugin -Pjeemi-components -Pjeemi-coverage
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)

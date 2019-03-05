@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>net.jeemi</groupId>
+		<artifactId>jeemi</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
+	
+	<artifactId>jeemi-ri-machine-test-config</artifactId>
+	<packaging>mar</packaging>
+	
+	<name>JEEMI RI - Machine - Test Configuration</name>
+	<description>
+		Machine configuration for JEEMI RI Machine integration testing.
+	</description>
+	
+	<dependencies>
+		
+		<dependency>
+			<groupId>net.jeemi</groupId>
+			<artifactId>jeemi-api</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.rabbitmq</groupId>
+			<artifactId>amqp-client</artifactId>
+			<version>5.6.0</version>
+		</dependency>
+		
+	</dependencies>
+	
+	<build>
+		<plugins>
+			
+			<plugin>
+				<groupId>net.jeemi</groupId>
+				<artifactId>jeemi-maven-plugin</artifactId>
+				<version>0.1-SNAPSHOT</version>
+				<extensions>true</extensions>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>certificates-resources</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.certificates.workingDirectory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/certificates</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>certificates-build</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>process-resources</phase>
+						<configuration>
+							<target name="process-resources">
+								<ant target="certificates" antfile="${basedir}/src/main/ant/certificates.xml" dir="${project.certificates.workingDirectory}">
+									<property name="maven.project.build.outputDirectory" value="${project.build.outputDirectory}"/>
+								</ant>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+		</plugins>
+	</build>
+	
+	<properties>
+		<project.certificates.workingDirectory>${project.build.directory}/certificates</project.certificates.workingDirectory>
+	</properties>
+	
+</project>

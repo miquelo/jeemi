@@ -22,7 +22,8 @@
 				"{{template_dir}}/script/prepare.sh",
 				"{{template_dir}}/script/ssh-server.sh",
 				"{{template_dir}}/script/jdk8.sh",
-				"{{template_dir}}/script/apache2.sh"
+				"{{template_dir}}/script/apache2.sh",
+				"{{template_dir}}/script/clean.sh"
 			]
 		}
 	]

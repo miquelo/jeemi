@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	
+	<target name="packer" description="Build machine image">
+		
+		<antcall target="remove-when-changed">
+			<param name="hashName" value="debian-root"/>
+			<param name="inputDir" value="input/debian-root"/>
+			<param name="outputDirSet" value="debian-root"/>
+		</antcall>
+		<antcall target="remove-when-changed">
+			<param name="hashName" value="jeemi-base"/>
+			<param name="inputDir" value="input/jeemi-base"/>
+			<param name="outputDirSet" value="jeemi-base"/>
+		</antcall>
+		<antcall target="remove-when-changed">
+			<param name="hashName" value="jeemi-machine"/>
+			<param name="inputDir" value="input/jeemi-machine"/>
+			<param name="outputDirSet" value="jeemi-machine"/>
+		</antcall>
+		<antcall target="remove-when-changed">
+			<param name="hashName" value="machine-jar"/>
+			<param name="inputDir" value="${maven.project.build.outputDirectory}"/>
+			<param name="outputDirSet" value="jeemi-machine"/>
+		</antcall>
+	
+		<antcall target="packer-build">
+			<param name="inputDir" value="input/debian-root"/>
+			<param name="outputDir" value="output/debian-root"/>
+		</antcall>
+		<antcall target="packer-build">
+			<param name="inputDir" value="input/jeemi-base"/>
+			<param name="outputDir" value="output/jeemi-base"/>
+		</antcall>
+		<antcall target="packer-build">
+			<param name="inputDir" value="input/jeemi-machine"/>
+			<param name="outputDir" value="output/jeemi-machine"/>
+		</antcall>
+	
+	</target>
+	
+	<target name="remove-when-changed">
+		
+		<property name="hashDir" value="hash"/>
+		<property name="hashFile" value="${hashDir}/${hashName}.sum"/>
+		<property name="hashNewFile" value="${hashDir}/${hashName}-new.sum"/>
+		
+		<mkdir dir="${hashDir}"/>
+		<touch file="${hashFile}"/>
+		<checksum algorithm="SHA-512" totalproperty="inputDirChecksum" todir="${hashDir}/${hashName}">
+			<fileset dir="${inputDir}"/>
+		</checksum>
+		<echo message="${inputDirChecksum}" file="${hashNewFile}"/>
+		<condition property="inputDirChanged" value="false" else="true">
+			<filesmatch file1="${hashFile}" file2="${hashNewFile}" textfile="true"/>
+	    </condition>
+		<antcall target="remove-when-changed-${outputDirSet}"/>
+		<copy file="${hashNewFile}" tofile="${hashFile}" overwrite="true"/>
+		<delete file="${hashNewFile}"/>
+		
+	</target>
+	
+	<target name="remove-when-changed-debian-root" if="${inputDirChanged}">
+		
+		<delete dir="${basedir}/output/debian-root"/>
+		<delete dir="${basedir}/output/jeemi-base"/>
+		<delete dir="${basedir}/output/jeemi-machine"/>
+		
+	</target>
+	
+	<target name="remove-when-changed-jeemi-base" if="${inputDirChanged}">
+		
+		<delete dir="${basedir}/output/jeemi-base"/>
+		<delete dir="${basedir}/output/jeemi-machine"/>
+		
+	</target>
+	
+	<target name="remove-when-changed-jeemi-machine" if="${inputDirChanged}">
+		
+		<delete dir="${basedir}/output/jeemi-machine"/>
+		
+	</target>
+	
+	<target name="packer-build">
+	
+		<property name="templateFile" value="${inputDir}/template-${maven.phase}.json"/>
+		
+		<condition property="mustBuild">
+			<and>
+				<not>
+					<available file="${outputDir}" type="dir"/>
+				</not>
+				<available file="${templateFile}" type="file"/>
+			</and>
+		</condition>
+		<antcall target="packer-build-perform">
+			<param name="templateFile" value="${templateFile}"/>
+		</antcall>
+	
+	</target>
+	
+	<target name="packer-build-perform" if="${mustBuild}">
+		
+		<exec executable="packer" failonerror="true">
+			<arg value="build"/>
+			<arg value="-color=false"/>
+			<arg value="${templateFile}"/>
+		</exec>
+		
+	</target>
+
+</project>

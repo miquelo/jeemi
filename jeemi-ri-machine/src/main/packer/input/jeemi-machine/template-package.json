@@ -36,7 +36,8 @@
 			"type": "shell",
 			"scripts": [
 				"{{template_dir}}/script/configure.sh",
-				"{{template_dir}}/script/clean.sh"
+				"{{template_dir}}/script/clean.sh",
+				"{{template_dir}}/script/seal.sh"
 			]
 		}
 	]

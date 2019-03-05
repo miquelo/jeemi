@@ -17,9 +17,20 @@
 	
 	<name>JEEMI RI - Machine</name>
 	<description>
-		Common resources for building a machine of Jakarta EE Mutable
-		Infrastructure reference implementation.
+		Machine of Jakarta EE Mutable Infrastructure reference implementation.
 	</description>
+	
+	<dependencies>
+	
+		<dependency>
+			<groupId>net.jeemi</groupId>
+			<artifactId>jeemi-ri-machine-test-config</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<type>mar</type>
+			<scope>test</scope>
+		</dependency>
+		
+	</dependencies>
 	
 	<build>
 		<plugins>
@@ -30,7 +41,7 @@
 				<executions>
 					<execution>
 						<id>packer-resources</id>
-						<phase>process-resources</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
@@ -39,22 +50,6 @@
 							<resources>
 								<resource>
 									<directory>${basedir}/src/main/packer</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test-archive-resources</id>
-						<phase>process-test-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.testArchive.workingDirectory}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}/src/test/archive</directory>
 									<filtering>true</filtering>
 								</resource>
 							</resources>
@@ -70,7 +65,7 @@
 				<executions>
 					<execution>
 						<id>download-glassfish-v5</id>
-						<phase>process-resources</phase>
+						<phase>>prepare-package</phase>
 						<goals>
 							<goal>wget</goal>
 						</goals>
@@ -93,8 +88,8 @@
 						</goals>
 						<phase>package</phase>
 						<configuration>
-							<target name="build">
-								<ant target="packer" antfile="${basedir}/src/main/ant/build.xml" dir="${project.packer.workingDirectory}">
+							<target name="package">
+								<ant target="packer" antfile="${basedir}/src/main/ant/packer.xml" dir="${project.packer.workingDirectory}">
 									<property name="maven.phase" value="package"/>
 									<property name="maven.project.build.outputDirectory" value="${project.build.outputDirectory}"/>
 								</ant>
@@ -107,29 +102,15 @@
 						<goals>
 							<goal>run</goal>
 						</goals>
-						<phase>package</phase>
+						<phase>deploy</phase>
 						<configuration>
-							<target name="build">
+							<target name="deploy">
 								<ant target="packer" antfile="${basedir}/src/main/ant/build.xml" dir="${project.packer.workingDirectory}">
 									<property name="maven.phase" value="deploy"/>
 									<property name="maven.project.build.outputDirectory" value="${project.build.outputDirectory}"/>
 								</ant>
 							</target>
 							<skip>${project.packer.skip}</skip>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test-archive</id>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<phase>process-test-resources</phase>
-						<configuration>
-							<target name="build">
-								<ant target="archive" antfile="${basedir}/src/test/ant/build.xml" dir="${project.testArchive.workingDirectory}">
-									<property name="maven.basedir" value="${basedir}"/>
-								</ant>
-							</target>
 						</configuration>
 					</execution>
 				</executions>
@@ -150,9 +131,9 @@
 	</build>
 	
 	<properties>
+		<project.integrationTestClass>net.jeemi.ri.machine.integration.Integration</project.integrationTestClass>
 		<project.packer.workingDirectory>${project.build.directory}/packer</project.packer.workingDirectory>
 		<project.packer.skip>${env.VIRTUALBOX_UNAVAILABLE}</project.packer.skip>
-		<project.testArchive.workingDirectory>${project.build.directory}/test-archive</project.testArchive.workingDirectory>
 	</properties>
 	
 </project>

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	
+	<target name="certificates" description="Build test machine configuration certificates">
+		
+		<condition property="mustBuild">
+			<not>
+				<available file="${basedir}/root" type="dir"/>
+			</not>
+		</condition>
+		<antcall target="certificate-root">
+			<param name="outputDir" value="${basedir}/root"/>
+		</antcall>
+		
+		<condition property="mustBuild">
+			<not>
+				<available file="${basedir}/ca" type="dir"/>
+			</not>
+		</condition>
+		<antcall target="certificate-ca">
+			<param name="outputDir" value="${basedir}/ca"/>
+			<param name="rootCertificateFile" value="${basedir}/root/certs/cert.pem"/>
+		</antcall>
+		
+		<condition property="mustBuild">
+			<not>
+				<available file="${basedir}/server" type="dir"/>
+			</not>
+		</condition>
+		<antcall target="certificate-server">
+			<param name="outputDir" value="${basedir}/server"/>
+		</antcall>
+		
+		<antcall target="copy-certificates">
+			<param name="outputDir" value="${maven.project.build.outputDirectory}/net/jeemi/ri/machine/test/config/certificates"/>
+		</antcall>
+		
+	</target>
+	
+	<target name="certificate-root" if="${mustBuild}">
+		
+		<mkdir dir="${outputDir}"/>
+		<mkdir dir="${outputDir}/certs"/>
+		<mkdir dir="${outputDir}/newcerts"/>
+		<mkdir dir="${outputDir}/private"/>
+		<touch file="${outputDir}/index.txt"/>
+		<touch file="${outputDir}/index.txt.attr"/>
+		<echo message="1000" file="${outputDir}/private/serial"/>
+		
+		<exec executable="openssl" failonerror="true">
+			<arg value="genrsa"/>
+			<arg value="-aes256"/>
+			<arg value="-out"/>
+			<arg value="${outputDir}/private/key.pem"/>
+			<arg value="-passout"/>
+			<arg value="pass:12345678"/>
+			<arg value="4096"/>
+		</exec>
+		
+		<exec executable="openssl" failonerror="true">
+			<arg value="req"/>
+			<arg value="-config"/>
+			<arg value="root.cnf"/>
+			<arg value="-key"/>
+			<arg value="${outputDir}/private/key.pem"/>
+			<arg value="-new"/>
+			<arg value="-x509"/>
+			<arg value="-days"/>
+			<arg value="7300"/>
+			<arg value="-sha256"/>
+			<arg value="-extensions"/>
+			<arg value="v3_ca"/>
+			<arg value="-out"/>
+			<arg value="${outputDir}/certs/cert.pem"/>
+			<arg value="-passin"/>
+			<arg value="pass:12345678"/>
+			<arg value="-subj"/>
+			<arg value="/O=JEEMI Test/OU=Development/CN=JEEMI Test Root"/>
+		</exec>
+		
+	</target>
+	
+	<target name="certificate-ca" if="${mustBuild}">
+			
+		<mkdir dir="${outputDir}"/>
+		<mkdir dir="${outputDir}/certs"/>
+		<mkdir dir="${outputDir}/csr"/>
+		<mkdir dir="${outputDir}/newcerts"/>
+		<mkdir dir="${outputDir}/private"/>
+		<touch file="${outputDir}/index.txt"/>
+		<touch file="${outputDir}/index.txt.attr"/>
+		<echo message="1000" file="${outputDir}/private/serial"/>
+		
+		<exec executable="openssl" failonerror="true">
+			<arg value="genrsa"/>
+			<arg value="-aes256"/>
+			<arg value="-out"/>
+			<arg value="${outputDir}/private/key.pem"/>
+			<arg value="-passout"/>
+			<arg value="pass:12345678"/>
+			<arg value="4096"/>
+		</exec>
+		
+		<exec executable="openssl" failonerror="true">
+			<arg value="req"/>
+			<arg value="-config"/>
+			<arg value="ca.cnf"/>
+			<arg value="-key"/>
+			<arg value="${outputDir}/private/key.pem"/>
+			<arg value="-new"/>
+			<arg value="-sha256"/>
+			<arg value="-out"/>
+			<arg value="${outputDir}/csr/csr.pem"/>
+			<arg value="-passin"/>
+			<arg value="pass:12345678"/>
+			<arg value="-subj"/>
+			<arg value="/O=JEEMI Test/OU=Development/CN=JEEMI Test CA"/>
+		</exec>
+		
+		<exec executable="openssl">
+			<arg value="ca"/>
+			<arg value="-config"/>
+			<arg value="root.cnf"/>
+			<arg value="-extensions"/>
+			<arg value="v3_intermediate_ca"/>
+			<arg value="-days"/>
+			<arg value="3650"/>
+			<arg value="-notext"/>
+			<arg value="-md"/>
+			<arg value="sha256"/>
+			<arg value="-in"/>
+			<arg value="${outputDir}/csr/csr.pem"/>
+			<arg value="-out"/>
+			<arg value="${outputDir}/certs/cert.pem"/>
+			<arg value="-passin"/>
+			<arg value="pass:12345678"/>
+			<arg value="-batch"/>
+		</exec>
+		
+		<concat destfile="${outputDir}/certs/chain.pem">
+			<fileset file="${outputDir}/certs/cert.pem"/>
+			<fileset file="${rootCertificateFile}"/>
+		</concat>
+	
+	</target>
+	
+	<target name="certificate-server" if="${mustBuild}">
+				
+		<mkdir dir="${outputDir}"/>
+		<mkdir dir="${outputDir}/certs"/>
+		<mkdir dir="${outputDir}/csr"/>
+		<mkdir dir="${outputDir}/private"/>
+		
+		<exec executable="openssl" failonerror="true">
+			<arg value="genrsa"/>
+			<arg value="-out"/>
+			<arg value="${outputDir}/private/jeemi.test.key.pem"/>
+			<arg value="2048"/>
+		</exec>
+		
+		<exec executable="openssl" failonerror="true">
+			<arg value="req"/>
+			<arg value="-config"/>
+			<arg value="ca.cnf"/>
+			<arg value="-key"/>
+			<arg value="${outputDir}/private/jeemi.test.key.pem"/>
+			<arg value="-new"/>
+			<arg value="-sha256"/>
+			<arg value="-out"/>
+			<arg value="${outputDir}/csr/jeemi.test.csr.pem"/>
+			<arg value="-passin"/>
+			<arg value="pass:12345678"/>
+			<arg value="-subj"/>
+			<arg value="/O=JEEMI Test/OU=Development/CN=jeemi.test"/>
+		</exec>
+		
+		<exec executable="openssl" failonerror="true">
+			<arg value="ca"/>
+			<arg value="-config"/>
+			<arg value="ca.cnf"/>
+			<arg value="-extensions"/>
+			<arg value="server_cert"/>
+			<arg value="-days"/>
+			<arg value="375"/>
+			<arg value="-notext"/>
+			<arg value="-md"/>
+			<arg value="sha256"/>
+			<arg value="-in"/>
+			<arg value="${outputDir}/csr/jeemi.test.csr.pem"/>
+			<arg value="-out"/>
+			<arg value="${outputDir}/certs/jeemi.test.cert.pem"/>
+			<arg value="-passin"/>
+			<arg value="pass:12345678"/>
+			<arg value="-batch"/>
+		</exec>
+		
+	</target>
+	
+	<target name="copy-certificates">
+		
+		<mkdir dir="${outputDir}"/>
+		<mkdir dir="${outputDir}/root"/>
+		<copy todir="${basedir}/root">
+			<fileset dir="${basedir}/root/certs" includes="*.pem"/>
+			<fileset dir="${basedir}/root/private" includes="*.pem"/>
+		</copy>
+		<mkdir dir="${outputDir}/ca"/>
+		<copy todir="${outputDir}/ca">
+			<fileset dir="${basedir}/ca/certs" includes="*.pem"/>
+			<fileset dir="${basedir}/ca/private" includes="*.pem"/>
+		</copy>
+		<mkdir dir="${outputDir}/server"/>
+		<copy todir="${outputDir}/server">
+			<fileset dir="${basedir}/server/certs" includes="*"/>
+			<fileset dir="${basedir}/server/private" includes="*"/>
+		</copy>
+		
+	</target>
+
+</project>
